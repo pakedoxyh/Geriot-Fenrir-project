@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>FENRIR AI — Frontend Prototype</title>
+<style>
+:root{
+  --bg:#08090b;--panel:#101115;--panel2:#15161b;--panel3:#1b1c22;
+  --line:#24252d;--text:#f2f2f5;--muted:#8b8d98;--dim:#626572;
+  --purple:#9158ff;--purple2:#a66bff;--purple-bg:#241a39;
+  --sidebar:222px;--radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);
+font-family:"SF Pro Display","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+button,input,textarea{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer}
+.app{height:100vh;display:flex;background:var(--bg)}
+.sidebar{width:var(--sidebar);height:100%;flex:none;background:#101115;border-right:1px solid #25262c;padding:16px 18px 17px 19px;display:flex;flex-direction:column}
+.brand{height:30px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;letter-spacing:.1px;margin-bottom:20px}
+.brand-mark{width:25px;height:25px;border-radius:7px;background:linear-gradient(145deg,#aa68ff,#6f3de7);position:relative;box-shadow:0 0 15px #7e42ed55;overflow:hidden}
+.brand-mark:before{content:"";position:absolute;inset:4px;background:radial-gradient(circle at 30% 30%,#fff7 0 1px,transparent 2px),linear-gradient(135deg,transparent 45%,#fff4 46% 49%,transparent 50%),linear-gradient(45deg,transparent 46%,#fff3 47% 50%,transparent 51%);opacity:.65}
+.new-chat{height:35px;border:1px solid #8a4cf4;border-radius:7px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:12px;font-weight:600;margin-bottom:15px;transition:.15s}
+.new-chat:hover{background:#1b1429;box-shadow:0 0 20px #8b4cff20}
+.plus{font-size:18px;line-height:0;font-weight:300}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-item{height:34px;border-radius:6px;color:#9295a0;display:flex;align-items:center;gap:10px;padding:0 9px;font-size:12px;text-align:left;white-space:nowrap;overflow:hidden}
+.nav-item:hover{background:#17181e;color:#c6c7ce}
+.nav-item.active{background:#2a2140;color:#ece9f5}
+.icon{width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;flex:none;color:currentColor}
+.icon svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.sidebar-bottom{margin-top:auto;border-top:1px solid #292a30;padding-top:14px;display:flex;flex-direction:column;gap:2px}
+.sidebar-link{height:30px;color:#8b8e98;font-size:11px;display:flex;align-items:center;gap:10px;padding:0 8px;border-radius:6px}
+.sidebar-link:hover{background:#17181e;color:#d0d1d7}
+.main{min-width:0;flex:1;height:100%;position:relative;overflow:hidden}
+.view{display:none;width:100%;height:100%;position:relative}
+.view.active{display:flex}
+.home{align-items:center;justify-content:center;flex-direction:column;padding-bottom:4vh}
+.hero{width:min(100%,690px);display:flex;flex-direction:column;align-items:center;transform:translateY(-1.5vh)}
+.hero-title{font-size:72px;line-height:.9;font-weight:800;letter-spacing:-3px;margin:0 0 22px}
+.hero-sub{font-size:13px;color:#9b58ff;font-weight:600;letter-spacing:.55px;text-transform:uppercase;margin-bottom:43px}
+.composer{width:685px;max-width:calc(100vw - var(--sidebar) - 80px);height:105px;border:1px solid #7040bf;border-radius:24px;background:#17181d;box-shadow:0 10px 40px #0008;position:relative;padding:14px 15px 12px;transition:.2s}
+.composer:focus-within{border-color:#9257f4;box-shadow:0 10px 45px #000a,0 0 0 1px #8d52ec33}
+.composer-top{display:flex;align-items:center;gap:11px;height:39px}
+.circle-plus{width:29px;height:29px;border-radius:50%;background:#202229;color:#c9cad0;display:grid;place-items:center;font-size:20px}
+.fake-placeholder{color:#8e909b;font-size:14px;flex:1}
+.composer-text{position:absolute;left:55px;right:55px;top:14px;height:40px;border:0;outline:0;background:transparent;resize:none;font-size:14px;line-height:20px;padding:9px 0;display:none}
+.composer-text.show{display:block}
+.composer-text::placeholder{color:#8e909b}
+.composer-bottom{position:absolute;left:15px;right:15px;bottom:12px;height:28px;display:flex;align-items:center}
+.mode{height:28px;border-radius:16px;background:#111217;display:flex;padding:2px}
+.mode button{padding:0 14px;border-radius:14px;color:#767986;font-size:11px}
+.mode button.active{background:#282a32;color:#eee}
+.composer-actions{margin-left:auto;display:flex;align-items:center;gap:13px}
+.mic{color:#8f929d;width:16px;height:16px}
+.send{width:29px;height:29px;border-radius:50%;background:#9255f3;display:grid;place-items:center;box-shadow:0 0 18px #8f4fff35;transition:.15s}
+.send:hover{background:#a568ff;transform:translateY(-1px)}
+.send svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tools{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:35px;max-width:700px}
+.tool{height:27px;padding:0 11px;border-radius:15px;background:#191a1f;border:1px solid #22242a;color:#aeb0ba;font-size:11px;display:flex;align-items:center;gap:6px}
+.tool:hover{background:#22232a;color:#eee}
+.footer{position:absolute;bottom:27px;left:0;right:0;text-align:center;font-size:9px;color:#353844}
+.chat{flex-direction:column}
+.chat-head{height:66px;border-bottom:1px solid #24252b;display:flex;align-items:center;padding:0 26px;flex:none}
+.chat-title{font-size:13px;font-weight:650}
+.chat-meta{font-size:10px;color:#6f727d;margin-top:4px}
+.status{margin-left:auto;font-size:9px;color:#9d61ff;background:#24183a;border-radius:12px;padding:5px 10px;font-weight:700}
+.more{width:29px;height:29px;margin-left:9px;border-radius:50%;background:#17181d;color:#7f828c;font-weight:800;letter-spacing:2px}
+.messages{flex:1;overflow:auto;padding:31px 0 130px;scroll-behavior:smooth}
+.messages-inner{width:min(720px,calc(100% - 50px));margin:0 auto;display:flex;flex-direction:column;gap:25px}
+.msg-row{display:flex;align-items:flex-start;gap:11px}
+.msg-row.user{justify-content:flex-end}
+.msg-avatar{width:27px;height:27px;border-radius:7px;background:linear-gradient(145deg,#9d59ff,#783fea);flex:none;margin-top:4px;box-shadow:0 0 13px #8244ef33}
+.bubble{max-width:550px;padding:12px 14px;border-radius:13px;background:#17181d;color:#c9cad0;font-size:12px;line-height:1.5;border:1px solid #202229}
+.user .bubble{background:#21162f;border-color:#36264d;color:#ddd4e9}
+.ai-card{max-width:560px;background:#17181d;border:1px solid #282a31;border-radius:4px 12px 12px 12px;padding:12px 14px;color:#c9cad0;font-size:12px;line-height:1.55}
+.ai-card .inner{margin-top:7px;background:#101115;border:1px solid #282a30;border-radius:7px;padding:12px}
+.ai-card h3{font-size:13px;color:#f0f0f2;margin:0 0 9px}
+.ai-card p{margin:0 0 11px}
+.ai-card ul{margin:0 0 11px;padding-left:17px}
+.ai-card li{margin:5px 0}
+.ai-card .hash{color:#9d61ff}
+.chat-composer-wrap{position:absolute;bottom:22px;left:0;right:0;display:flex;justify-content:center;pointer-events:none}
+.chat-composer{pointer-events:auto;width:685px;max-width:calc(100% - 50px);height:105px}
+.chat-input{position:absolute;left:55px;right:55px;top:14px;height:41px;border:0;outline:0;background:transparent;resize:none;font-size:13px;line-height:20px;padding:9px 0}
+.chat-input::placeholder{color:#a0a2ac}
+.page{flex-direction:column;padding:34px 38px;overflow:auto}
+.page h1{font-size:27px;margin:0 0 7px}.page p{color:#777a85;font-size:12px;margin:0}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:30px;max-width:1100px}
+.card{background:#111217;border:1px solid #25262d;border-radius:12px;padding:18px;min-height:130px}
+.card h3{font-size:13px;margin:0 0 10px}.card span{font-size:11px;color:#777a85}.card .fake-line{height:8px;background:#1c1e24;border-radius:5px;margin-top:14px;width:80%}
+.task{display:flex;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid #202127;max-width:700px;font-size:12px}.check{width:17px;height:17px;border:1px solid #555864;border-radius:5px}.list{margin-top:28px}
+.mobile-menu{display:none}
+@media(max-width:900px){
+  :root{--sidebar:190px}.sidebar{padding-left:12px;padding-right:12px}.hero-title{font-size:60px}.composer,.chat-composer{width:620px}.messages-inner{width:min(720px,calc(100% - 32px))}
+}
+@media(max-width:700px){
+  .sidebar{position:fixed;z-index:20;left:-230px;top:0;width:230px;transition:left .2s;box-shadow:20px 0 50px #000b}
+  .sidebar.open{left:0}.main{width:100%}.mobile-menu{display:grid;position:absolute;z-index:5;top:13px;left:13px;width:34px;height:34px;border-radius:9px;background:#17181d;border:1px solid #292b33;place-items:center;color:#bbb}
+  .home{padding:0 15px 5vh}.hero{transform:translateY(-4vh)}.hero-title{font-size:48px;letter-spacing:-2px;margin-bottom:17px}.hero-sub{font-size:9px;margin-bottom:31px}
+  .composer{width:100%;max-width:none;height:112px;border-radius:20px}.tools{margin-top:23px;gap:6px}.tool{font-size:10px;padding:0 9px}
+  .chat-head{height:58px;padding:0 13px 0 57px}.chat-title{font-size:12px}.messages{padding-top:24px}.messages-inner{width:calc(100% - 22px);gap:20px}.bubble,.ai-card{font-size:11px;max-width:82%}.chat-composer-wrap{bottom:10px}.chat-composer{max-width:calc(100% - 18px);height:105px}.chat-input{font-size:12px}
+  .page{padding:68px 17px 30px}.cards{grid-template-columns:1fr}.page h1{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="brand-mark"></span><span>FENRIR AI</span></div>
+    <button class="new-chat" data-action="new"><span class="plus">+</span>Новый чат</button>
+    <nav class="nav">
+      <button class="nav-item active" data-view="home"><span class="icon">💬</span>Мои чаты</button>
+      <button class="nav-item" data-view="tasks"><span class="icon">☷</span>Задачи</button>
+      <button class="nav-item" data-view="context"><span class="icon">▤</span>Контекст</button>
+      <button class="nav-item" data-view="slides"><span class="icon">▱</span>Слайды</button>
+      <button class="nav-item" data-view="research"><span class="icon">⌕</span>Глубокое исследование</button>
+      <button class="nav-item" data-view="sites"><span class="icon">⌁</span>Сайты</button>
+      <button class="nav-item" data-view="bookmarks"><span class="icon">▯</span>Закладки</button>
+      <button class="nav-item" data-view="tables"><span class="icon">▤</span>Таблицы</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="sidebar-link"><span class="icon">?</span>О нас</button>
+      <button class="sidebar-link"><span class="icon">⊕</span>Язык: Русский</button>
+      <button class="sidebar-link"><span class="icon">!</span>Получить помощь</button>
+      <button class="sidebar-link"><span class="icon">↪</span>Выйти</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <button class="mobile-menu" id="mobileMenu">☰</button>
+
+    <section class="view active home" id="home">
+      <div class="hero">
+        <h1 class="hero-title">FENRIR</h1>
+        <div class="hero-sub">ВАШ ИНТЕЛЛЕКТУАЛЬНЫЙ АГЕНТ</div>
+        <div class="composer" id="homeComposer">
+          <div class="composer-top"><button class="circle-plus">+</button><div class="fake-placeholder" id="homePlaceholder">Спросите что угодно...</div></div>
+          <textarea class="composer-text" id="homeInput" placeholder="Спросите что угодно..." rows="1"></textarea>
+          <div class="composer-bottom">
+            <div class="mode"><button class="active">Быстрый</button><button>Опытный</button></div>
+            <div class="composer-actions"><span class="mic">♩</span><button class="send" id="homeSend"><svg viewBox="0 0 24 24"><path d="M5 12h12M13 6l6 6-6 6"/></svg></button></div>
+          </div>
+        </div>
+        <div class="tools">
+          <button class="tool">▤ Контекст</button><button class="tool">▱ Слайды</button><button class="tool">⌕ Глубокое исследование</button><button class="tool">⌁ Сайты</button>
+          <button class="tool">▯ Документы</button><button class="tool">▤ Таблицы</button>
+        </div>
+      </div>
+      <div class="footer">GERIOT LLC. • Конфиденциальность гарантирована сквозным шифрованием</div>
+    </section>
+
+    <section class="view chat" id="chat">
+      <header class="chat-head">
+        <div><div class="chat-title" id="chatName">Запуск приложения для медитации</div><div class="chat-meta">В диалоге с Fenrir AI • Режим «Быстрый»</div></div>
+        <span class="status">АКТИВЕН</span><button class="more">•••</button>
+      </header>
+      <div class="messages" id="messages"><div class="messages-inner" id="messagesInner">
+        <div class="msg-row user"><div class="bubble">Привет! Можешь помочь мне написать пост для соцсетей о запуске нового продукта?</div></div>
+        <div class="msg-row"><div class="msg-avatar"></div><div class="bubble">Конечно! Расскажи подробнее о продукте — что это, для кого, и какой тон: официальный, дружелюбный или провокационный?</div></div>
+        <div class="msg-row user"><div class="bubble">Это приложение для медитации, целевая — молодые профессионалы 25–35 лет. Тон — тёплый и вдохновляющий.</div></div>
+        <div class="msg-row"><div class="msg-avatar"></div><div class="ai-card">Вот проект вдохновляющего поста для запуска вашего приложения:
+          <div class="inner"><h3>🧘 Найдите свой центр в хаосе будней</h3><p>Каждый день мы бежим марафон: дедлайны, встречи, бесконечные уведомления. Но когда вы последний раз просто... дышали?</p><p>Мы создали AURA — приложение для медитации нового поколения, разработанное специально для тех, кто ценит свое время и ментальное здоровье.</p><strong>✨ Что внутри?</strong><ul><li>Микро-практики от 3 минут для быстрого перерыва во время работы</li><li>Персонализированные звуковые ландшафты для глубокого фокуса</li><li>Умные напоминания о бережном отношении к себе</li></ul><p>Начните заботиться о себе уже сегодня. Ссылка на скачивание в профиле! 🚀</p><div class="hash">#медитация #осознанность #AuraApp #ментальнаяпродуктивность</div></div>
+        </div></div>
+        <div class="msg-row user"><div class="bubble">Отлично! А можешь сделать версию покороче, буквально 2–3 предложения?</div></div>
+        <div class="msg-row"><div class="msg-avatar"></div><div class="ai-card">Конечно, вот лаконичная версия для быстрого чтения:
+          <div class="inner">Забудьте о стрессе и найдите свой внутренний баланс с новым приложением для медитации AURA. Простые микро-практики на 3 минуты идеально впишутся в ваш плотный график и вернут ясность ума. Ссылка в профиле! 🧘✨</div>
+        </div></div>
+      </div></div>
+      <div class="chat-composer-wrap">
+        <div class="composer chat-composer">
+          <button class="circle-plus">+</button>
+          <textarea class="chat-input" id="chatInput" placeholder="Напишите сообщение..." rows="1"></textarea>
+          <div class="composer-bottom"><div class="mode"><button class="active">Быстрый</button><button>Опытный</button></div><div class="composer-actions"><span class="mic">♩</span><button class="send" id="chatSend"><svg viewBox="0 0 24 24"><path d="M5 12h12M13 6l6 6-6 6"/></svg></button></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view page" id="tasks"><h1>Задачи</h1><p>Управляйте задачами, которые выполняет ваш интеллектуальный агент.</p><div class="list"><div class="task"><span class="check"></span>Подготовить контент для запуска</div><div class="task"><span class="check"></span>Собрать идеи для рекламной кампании</div><div class="task"><span class="check"></span>Проверить результаты исследования</div></div></section>
+    <section class="view page" id="context"><h1>Контекст</h1><p>Материалы и знания, доступные вашему AI-агенту.</p><div class="cards"><div class="card"><h3>Рабочий контекст</h3><span>12 источников</span><div class="fake-line"></div></div><div class="card"><h3>Проекты</h3><span>4 проекта</span><div class="fake-line"></div></div><div class="card"><h3>Последние материалы</h3><span>Обновлено сегодня</span><div class="fake-line"></div></div></div></section>
+    <section class="view page" id="slides"><h1>Слайды</h1><p>Создавайте презентации из ваших запросов и материалов.</p><div class="cards"><div class="card"><h3>Новая презентация</h3><span>Начать с чистого листа</span></div><div class="card"><h3>Шаблоны</h3><span>Выберите структуру презентации</span></div></div></section>
+    <section class="view page" id="research"><h1>Глубокое исследование</h1><p>Сложные задачи, требующие поиска, анализа и синтеза информации.</p><div class="cards"><div class="card"><h3>Новое исследование</h3><span>Опишите тему и цель</span></div></div></section>
+    <section class="view page" id="sites"><h1>Сайты</h1><p>Создание и работа с веб-страницами с помощью AI.</p><div class="cards"><div class="card"><h3>Создать сайт</h3><span>Опишите идею проекта</span></div><div class="card"><h3>Мои проекты</h3><span>0 опубликованных сайтов</span></div></div></section>
+    <section class="view page" id="bookmarks"><h1>Закладки</h1><p>Сохраняйте важные ответы и материалы.</p><div class="cards"><div class="card"><h3>Сохранённые ответы</h3><span>Здесь появятся ваши закладки</span></div></div></section>
+    <section class="view page" id="tables"><h1>Таблицы</h1><p>Структурируйте данные и работайте с ними вместе с AI.</p><div class="cards"><div class="card"><h3>Новая таблица</h3><span>Создать с нуля или по запросу</span></div></div></section>
+  </main>
+</div>
+<script>
+const views=[...document.querySelectorAll('.view')];
+const nav=[...document.querySelectorAll('.nav-item')];
+const sidebar=document.getElementById('sidebar');
+function showView(name){
+  views.forEach(v=>v.classList.toggle('active',v.id===name));
+  nav.forEach(n=>n.classList.toggle('active',n.dataset.view===name));
+  sidebar.classList.remove('open');
+}
+nav.forEach(n=>n.addEventListener('click',()=>showView(n.dataset.view)));
+document.getElementById('mobileMenu').addEventListener('click',()=>sidebar.classList.toggle('open'));
+document.querySelector('[data-action="new"]').addEventListener('click',()=>{
+  showView('home');
+  document.getElementById('homeInput').value='';
+  document.getElementById('homeInput').classList.remove('show');
+  document.getElementById('homePlaceholder').style.display='';
+});
+document.querySelectorAll('.mode').forEach(group=>group.querySelectorAll('button').forEach(btn=>{
+  btn.addEventListener('click',()=>group.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===btn)));
+}));
+function bindComposer(input,send,goChat){
+  const wrap=input.closest('.composer');
+  input.addEventListener('focus',()=>{wrap.querySelector('.fake-placeholder')?.style.setProperty('display','none');input.classList.add('show')});
+  input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,50)+'px'});
+  input.addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send.click()}
+  });
+  send.addEventListener('click',async()=>{
+    const text=input.value.trim();if(!text)return;
+    if(goChat){addUserMessage(text);input.value='';input.style.height='auto';setTimeout(()=>addAIMessage(mockAIResponse(text)),450);return}
+    showView('chat');document.getElementById('chatInput').value=text;document.getElementById('chatInput').focus();input.value='';input.classList.remove('show');document.getElementById('homePlaceholder').style.display='';
+  });
+}
+function addUserMessage(text){
+  const row=document.createElement('div');row.className='msg-row user';row.innerHTML='<div class="bubble"></div>';row.querySelector('.bubble').textContent=text;
+  document.getElementById('messagesInner').appendChild(row);scrollChat();
+}
+function addAIMessage(text){
+  const row=document.createElement('div');row.className='msg-row';row.innerHTML='<div class="msg-avatar"></div><div class="bubble"></div>';row.querySelector('.bubble').textContent=text;
+  document.getElementById('messagesInner').appendChild(row);scrollChat();
+}
+function scrollChat(){const m=document.getElementById('messages');requestAnimationFrame(()=>m.scrollTo({top:m.scrollHeight,behavior:'smooth'}))}
+function mockAIResponse(text){
+  if(/привет|здравств/i.test(text))return 'Привет! Я Fenrir AI. Сейчас это демонстрационный frontend, а подключение вашего backend можно добавить через API-слой.';
+  return 'Принял запрос. Сейчас отображается тестовый ответ frontend. Когда будет готов backend, эту функцию можно заменить на реальный API-запрос без изменения интерфейса.';
+}
+bindComposer(document.getElementById('homeInput'),document.getElementById('homeSend'),false);
+bindComposer(document.getElementById('chatInput'),document.getElementById('chatSend'),true);
+document.getElementById('chatInput').addEventListener('focus',scrollChat);
+</script>
+</body>
+</html>
